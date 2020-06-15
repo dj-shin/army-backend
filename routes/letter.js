@@ -91,34 +91,14 @@ router.get('/', function(req, res, next) {
 router.get('/:letterId', (req, res) => {
   Letter.findOneById(req.params.letterId)
     .then((letter) => {
-      if (!letter) return res.status(404).send({ err: 'Letter not found' });
+      if (!letter) {
+        return res.status(404).send({ err: 'Letter not found' });
+      }
+      if (letter.isPublic !== "true") {
+        return res.status(401).send({ err: 'Letter is not public' });
+      }
       res.send(letter);
     })
-    .catch(err => {
-      console.error(err);
-      return res.status(500).send(err);
-    });
-});
-
-router.put('/:letterId', (req, res) => {
-  Letter.updateById(req.params.letterId, req.body)
-    .then(letter => {
-      sendCamp(letter.title, letter.content)
-        .then(console.log)
-        .catch(err => {
-          console.error('sendCamp:', err);
-        });
-      return res.send(letter);
-    })
-    .catch(err => {
-      console.error(err);
-      return res.status(500).send(err);
-    });
-});
-
-router.delete('/:letterId', (req, res) => {
-  Letter.deleteById(req.params.letterId)
-    .then(() => res.sendStatus(200))
     .catch(err => {
       console.error(err);
       return res.status(500).send(err);
