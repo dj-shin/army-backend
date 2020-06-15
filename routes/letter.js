@@ -113,7 +113,7 @@ async function onPost(req, res) {
 
   if (req.body.content.length > contentLimit) {
     const messages = [];
-    for (let i = 0; i < Math.floor(req.body.content.length / contentLimit); i++) {
+    for (let i = 0; i < Math.ceil(req.body.content.length / contentLimit); i++) {
       messages.push(sendCamp(
         `${req.body.title} (${i + 1}) - ${req.body.sender}`,
         req.body.content.slice(i * contentLimit, (i + 1) * contentLimit),
