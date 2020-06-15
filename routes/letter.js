@@ -106,9 +106,10 @@ router.get('/:letterId', (req, res) => {
 });
 
 async function onPost(req, res) {
-  const result = await sendCamp(req.body.title, req.body.content)
+  const result = await sendCamp(req.body.title + ' - ' + req.body.sender, req.body.content)
     .catch(err => {
       console.error('Error in sendCamp: ', err);
+      return res.status(500).send(err);
     });
   console.log('sendCamp:', result);
   if (result) {
