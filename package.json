@@ -12,6 +12,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.16.4",
     "mongoose": "^5.9.18",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "the-camp-lib": "^2.3.0"
   }
 }
