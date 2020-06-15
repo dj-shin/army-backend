@@ -11,6 +11,8 @@ async function sendCamp(title, content) {
   dotenv.config();
 
   if (process.env.SKIP_CAMP) {
+    console.log(`SKIP_CAMP:title ${title}`);
+    console.log(`SKIP_CAMP:content ${content}`);
     return true;
   }
 
@@ -106,12 +108,28 @@ router.get('/:letterId', (req, res) => {
 });
 
 async function onPost(req, res) {
-  const result = await sendCamp(req.body.title + ' - ' + req.body.sender, req.body.content)
-    .catch(err => {
-      console.error('Error in sendCamp: ', err);
-      return res.status(500).send(err);
-    });
-  console.log('sendCamp:', result);
+  const contentLimit = 1500;
+  let result;
+
+  if (req.body.content.length > contentLimit) {
+    const messages = [];
+    for (let i = 0; i < Math.floor(req.body.content.length / contentLimit); i++) {
+      messages.push(sendCamp(
+        `${req.body.title} (${i + 1}) - ${req.body.sender}`,
+        req.body.content.slice(i * contentLimit, (i + 1) * contentLimit),
+      ));
+    }
+    const results = await Promise.all(messages);
+    result = results.reduce((acc, e) => acc && e, true);
+  } else {
+    result = await sendCamp(req.body.title + ' - ' + req.body.sender, req.body.content)
+      .catch(err => {
+        console.error('Error in sendCamp: ', err);
+        return res.status(500).send(err);
+      });
+    console.log('sendCamp:', result);
+  }
+
   if (result) {
     req.body.completed = true;
   }
