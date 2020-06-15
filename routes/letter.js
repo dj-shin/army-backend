@@ -73,7 +73,7 @@ async function queryStatus() {
 }
 
 router.get('/', function(req, res, next) {
-  Letter.findAll().select('title sender completed')
+  Letter.findAll().select('-content').sort('-createdAt')
     .then((letters) => {
       queryStatus()
         .then(result => {
