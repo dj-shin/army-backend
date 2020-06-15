@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "PORT=7890 node bin/www"
+    "start": "PORT=7890 node bin/www",
+    "run": "PORT=7890 pm2 start bin/www"
   },
   "dependencies": {
     "body-parser": "^1.19.0",

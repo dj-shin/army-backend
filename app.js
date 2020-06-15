@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use('/letter', letterRouter);
+app.use('/api/letter', letterRouter);
 
 module.exports = app;
 // app.listen(port, () => console.log(`Server listening on port ${port}`));
