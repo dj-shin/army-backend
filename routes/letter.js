@@ -76,6 +76,7 @@ router.get('/:letterId', (req, res) => {
 async function onPost(req, res) {
   const contentLimit = 1500;
   let result;
+  let error;
 
   if (req.body.content.length > contentLimit) {
     const messages = [];
@@ -90,14 +91,14 @@ async function onPost(req, res) {
       result = results.reduce((acc, e) => acc && e, true);
     } catch (err) {
       console.log('Error in sendCamp: ', err);
-      return res.status(503).send({ message: err.message });
+      error = err.message;
     }
   } else {
     try {
       result = await sendCamp(req.body.title + ' - ' + req.body.sender, req.body.content);
     } catch (err) {
       console.log('Error in sendCamp: ', err);
-      return res.status(503).send({ message: err.message });
+      error = err.message;
     }
   }
 
@@ -105,6 +106,9 @@ async function onPost(req, res) {
     req.body.completed = true;
   }
   const letter = await Letter.create(req.body);
+  if (error) {
+    return res.status(503).send({ message: error });
+  }
   return res.send(letter);
 }
 
