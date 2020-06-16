@@ -90,14 +90,14 @@ async function onPost(req, res) {
       result = results.reduce((acc, e) => acc && e, true);
     } catch (err) {
       console.log('Error in sendCamp: ', err);
-      return res.status(500).send({ message: err.message });
+      return res.status(503).send({ message: err.message });
     }
   } else {
     try {
       result = await sendCamp(req.body.title + ' - ' + req.body.sender, req.body.content);
     } catch (err) {
       console.log('Error in sendCamp: ', err);
-      return res.status(500).send({ message: err.message });
+      return res.status(503).send({ message: err.message });
     }
   }
 
