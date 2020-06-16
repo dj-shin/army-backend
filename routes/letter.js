@@ -52,7 +52,7 @@ router.get('/', function(req, res, next) {
     })
     .catch(err => {
       console.error(err);
-      return res.status(500).send(err);
+      return res.status(500).send({ message: err.message });
     });
 });
 
@@ -60,16 +60,16 @@ router.get('/:letterId', (req, res) => {
   Letter.findOneById(req.params.letterId)
     .then((letter) => {
       if (!letter) {
-        return res.status(404).send({ err: 'Letter not found' });
+        return res.status(404).send({ message: 'Letter not found' });
       }
       if (letter.isPublic !== "true") {
-        return res.status(401).send({ err: 'Letter is not public' });
+        return res.status(401).send({ message: 'Letter is not public' });
       }
       res.send(letter);
     })
     .catch(err => {
-      console.error(err);
-      return res.status(500).send(err);
+      console.log(err);
+      return res.status(500).send({ message: err.message });
     });
 });
 
@@ -85,14 +85,20 @@ async function onPost(req, res) {
         req.body.content.slice(i * contentLimit, (i + 1) * contentLimit),
       ));
     }
-    const results = await Promise.all(messages);
-    result = results.reduce((acc, e) => acc && e, true);
+    try {
+      const results = await Promise.all(messages);
+      result = results.reduce((acc, e) => acc && e, true);
+    } catch (err) {
+      console.log('Error in sendCamp: ', err);
+      return res.status(500).send({ message: err.message });
+    }
   } else {
-    result = await sendCamp(req.body.title + ' - ' + req.body.sender, req.body.content)
-      .catch(err => {
-        console.error('Error in sendCamp: ', err);
-        return res.status(500).send(err);
-      });
+    try {
+      result = await sendCamp(req.body.title + ' - ' + req.body.sender, req.body.content);
+    } catch (err) {
+      console.log('Error in sendCamp: ', err);
+      return res.status(500).send({ message: err.message });
+    }
   }
 
   if (result) {
@@ -106,7 +112,7 @@ router.post('/', (req, res) => {
   onPost(req, res)
     .catch(err => {
       console.error(err);
-      return res.status(500).send(err);
+      return res.status(500).send({ message: err.message });
     });
 });
 
