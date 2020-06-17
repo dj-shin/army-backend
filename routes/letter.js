@@ -62,7 +62,7 @@ router.get('/:letterId', (req, res) => {
       if (!letter) {
         return res.status(404).send({ message: 'Letter not found' });
       }
-      if (letter.isPublic !== "true") {
+      if (letter.isPublic !== "true" && letter.isPublic !== "True") {
         return res.status(401).send({ message: 'Letter is not public' });
       }
       res.send(letter);
