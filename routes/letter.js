@@ -78,12 +78,31 @@ async function onPost(req, res) {
   let result;
   let error;
 
-  if (req.body.content.length > contentLimit) {
+  let paragraphs = req.body.content.split('\n');
+  let idx = 0;
+  const splitContents = [];
+
+  while (idx < paragraphs.length) {
+    const buffer = [];
+    while (
+      buffer.length < 25 &&
+      buffer.reduce((acc, text) => acc + text.length, 0) < contentLimit &&
+      idx < paragraphs.length
+    ) {
+      const paragraph = paragraphs[idx].trim();
+      if (paragraph) {
+        buffer.push(`<p>${paragraphs[idx]}</p>`);
+      }
+      idx++;
+    }
+    splitContents.push(buffer.join(''));
+  }
+
+  if (splitContents.length > 1) {
     const messages = [];
-    for (let i = 0; i < Math.ceil(req.body.content.length / contentLimit); i++) {
+    for (let i = 0; i < splitContents.length; i++) {
       messages.push(sendCamp(
-        `${req.body.title} (${i + 1}) - ${req.body.sender}`,
-        req.body.content.slice(i * contentLimit, (i + 1) * contentLimit),
+        `${req.body.title} (${i + 1}) - ${req.body.sender}`, splitContents[i],
       ));
     }
     try {
@@ -95,7 +114,7 @@ async function onPost(req, res) {
     }
   } else {
     try {
-      result = await sendCamp(req.body.title + ' - ' + req.body.sender, req.body.content);
+      result = await sendCamp(req.body.title + ' - ' + req.body.sender, splitContents[0]);
     } catch (err) {
       console.log('Error in sendCamp: ', err);
       error = err.message;
