@@ -91,9 +91,17 @@ async function onPost(req, res) {
     ) {
       const paragraph = paragraphs[idx].trim();
       if (paragraph) {
-        buffer.push(`<p>${paragraphs[idx]}</p>`);
+        if (buffer.reduce((acc, t) => acc + t.length, 0) + paragraph.length > contentLimit) {
+          const cut = contentLimit - buffer.reduce((acc, t) => acc + t.length, 0);
+          buffer.push(`<p>${paragraph.slice(0, cut)}</p>`);
+          paragraphs[idx] = paragraph.slice(cut);
+        } else {
+          buffer.push(`<p>${paragraph}</p>`);
+          idx++;
+        }
+      } else {
+        idx++;
       }
-      idx++;
     }
     splitContents.push(buffer.join(''));
   }
